@@ -15,9 +15,10 @@ function App() {
         <div>
             <p className="font-bold text-2xl">{message}</p>
             <div>
-                <Button variant="destructive">Bun Button</Button>
+                <Button variant="destructive">Bun Button!</Button>
             </div>
         </div>
     );
 }
+
 export default App;
