@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import z from 'zod';
+import { conversationRepository } from './repository/conversation';
 
 dotenv.config();
 
@@ -15,15 +16,9 @@ app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-app.get('', (req: Request, res: Response) => {
-    res.send('Hello Bunn!');
+app.get('/api/health', (req: Request, res: Response) => {
+    res.json({ message: 'Healthy' });
 });
-
-app.get('/api/test', (req: Request, res: Response) => {
-    res.json({ message: 'Test Successful!' });
-});
-
-const conversations = new Map<string, string>();
 
 const chatSchema = z.object({
     prompt: z
@@ -44,17 +39,20 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const prompt = req.body.prompt;
     const conversationId = req.body.conversationId;
 
-    console.log('Body', req.body);
+    try {
+        const response = await client.responses.create({
+            input: prompt,
+            model: 'gpt-5-nano3',
+            previous_response_id:
+                conversationRepository.getLastResponseId(conversationId),
+        });
 
-    const response = await client.responses.create({
-        input: prompt,
-        model: 'gpt-5-nano',
-        previous_response_id: conversations.get(conversationId),
-    });
+        conversationRepository.setLastResponseId(conversationId, response.id);
 
-    conversations.set(conversationId, response.id);
-
-    res.json({ message: response.output_text });
+        res.json({ message: response.output_text });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to generate a response' });
+    }
 });
 
 app.listen(port, () => {
