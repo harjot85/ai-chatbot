@@ -1,15 +1,11 @@
 import express from 'express';
 import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import OpenAI from 'openai';
+
 import z from 'zod';
-import { conversationRepository } from './repository/conversation';
+import { chatService } from './services/chat.service';
 
 dotenv.config();
-
-const client = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
 
 const app = express();
 app.use(express.json());
@@ -40,16 +36,9 @@ app.post('/api/chat', async (req: Request, res: Response) => {
     const conversationId = req.body.conversationId;
 
     try {
-        const response = await client.responses.create({
-            input: prompt,
-            model: 'gpt-5-nano3',
-            previous_response_id:
-                conversationRepository.getLastResponseId(conversationId),
-        });
+        const response = await chatService.sendMessage(prompt, conversationId);
 
-        conversationRepository.setLastResponseId(conversationId, response.id);
-
-        res.json({ message: response.output_text });
+        res.json({ message: response.message });
     } catch (error) {
         res.status(500).json({ error: 'Failed to generate a response' });
     }
