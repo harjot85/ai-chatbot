@@ -3,7 +3,7 @@ import { FaArrowUp } from 'react-icons/fa';
 import ReactMarkdown from 'react-markdown';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type FormData = {
     prompt: string;
@@ -24,6 +24,8 @@ export const Chatbot = () => {
     const conversationId = useRef(crypto.randomUUID());
     const [messages, setMessages] = useState<Message[]>([]);
     const [isfetching, setIsfetching] = useState(false);
+
+    const formRef = useRef<HTMLFormElement | null>(null);
 
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
@@ -46,6 +48,10 @@ export const Chatbot = () => {
         console.log(data);
     };
 
+    useEffect(() => {
+        formRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -59,9 +65,9 @@ export const Chatbot = () => {
                 {messages?.map((message, index) => (
                     <p
                         key={index}
-                        className={`rounded-2xl p-4 border-2 ${
+                        className={`rounded-2xl p-4  ${
                             message.role === 'bot'
-                                ? 'bg-gray-400 text-black text-left self-start'
+                                ? 'bg-gray-200 text-black text-left self-start'
                                 : 'bg-blue-600 text-white text-right self-end'
                         }`}
                     >
@@ -69,7 +75,7 @@ export const Chatbot = () => {
                     </p>
                 ))}
                 {isfetching && (
-                    <div className="flex bg-gray-400 gap-1 self-start ml-2 px-6 py-4 rounded-2xl">
+                    <div className="flex bg-gray-200 gap-1 self-start ml-2 px-6 py-4 rounded-2xl">
                         <div className="h-3 w-3 rounded-full bg-gray-700 animate-bounce" />
                         <div className="h-3 w-3 rounded-full bg-gray-600 animate-bounce [animation-delay:0.1s]" />
                         <div className="h-3 w-3 rounded-full bg-gray-500 animate-bounce [animation-delay:0.2s]" />
@@ -77,6 +83,7 @@ export const Chatbot = () => {
                 )}
             </div>
             <form
+                ref={formRef}
                 onKeyDown={handleKeyDown}
                 onSubmit={handleSubmit(onFormSubmit)}
                 className="flex flex-col gap-4 items-end m-4 w-full border-2 p-4 rounded-2xl"
