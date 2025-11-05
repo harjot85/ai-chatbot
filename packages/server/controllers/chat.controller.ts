@@ -7,7 +7,7 @@ const chatSchema = z.object({
         .string()
         .trim()
         .min(1, 'Promt is required')
-        .max(100, 'max length is 100'),
+        .max(500, 'max length is 500'),
     conversationId: z.uuid(),
 });
 

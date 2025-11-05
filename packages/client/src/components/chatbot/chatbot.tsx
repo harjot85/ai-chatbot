@@ -1,5 +1,6 @@
 import { Button } from '../ui/button';
 import { FaArrowUp } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -12,18 +13,24 @@ type ChatResponse = {
     message: string;
 };
 
-const rules =
-    '  Where appropriate, add some humor to the message. Keep the responses brief. ';
+type Message = {
+    content: string;
+    role: 'user' | 'bot';
+};
+
+const rules = ' Keep the responses brief. ';
 
 export const Chatbot = () => {
     const conversationId = useRef(crypto.randomUUID());
-    const [messages, setMessages] = useState<string[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [isfetching, setIsfetching] = useState(false);
 
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
     const onFormSubmit = async (formData: FormData) => {
         const parsedData = formData.prompt.trim();
-        setMessages((prev) => [...prev, parsedData]);
+        setMessages((prev) => [...prev, { content: parsedData, role: 'user' }]);
+        setIsfetching(true);
         reset();
 
         const { data } = await axios.post<ChatResponse>('/api/chat', {
@@ -31,7 +38,11 @@ export const Chatbot = () => {
             conversationId: conversationId.current,
         });
 
-        setMessages((prev) => [...prev, data.message]);
+        setMessages((prev) => [
+            ...prev,
+            { content: data.message, role: 'bot' },
+        ]);
+        setIsfetching(false);
         console.log(data);
     };
 
@@ -44,15 +55,27 @@ export const Chatbot = () => {
 
     return (
         <div>
-            {messages &&
-                messages.map((message, index) => (
+            <div className="flex flex-col gap-4">
+                {messages?.map((message, index) => (
                     <p
                         key={index}
-                        className="bg-gray-400 rounded-2xl p-4 border-2"
+                        className={`rounded-2xl p-4 border-2 ${
+                            message.role === 'bot'
+                                ? 'bg-gray-400 text-black text-left self-start'
+                                : 'bg-blue-600 text-white text-right self-end'
+                        }`}
                     >
-                        {message}
+                        <ReactMarkdown>{message.content}</ReactMarkdown>
                     </p>
                 ))}
+                {isfetching && (
+                    <div className="flex bg-gray-400 gap-1 self-start ml-2 px-6 py-4 rounded-2xl">
+                        <div className="h-3 w-3 rounded-full bg-gray-700 animate-bounce" />
+                        <div className="h-3 w-3 rounded-full bg-gray-600 animate-bounce [animation-delay:0.1s]" />
+                        <div className="h-3 w-3 rounded-full bg-gray-500 animate-bounce [animation-delay:0.2s]" />
+                    </div>
+                )}
+            </div>
             <form
                 onKeyDown={handleKeyDown}
                 onSubmit={handleSubmit(onFormSubmit)}
@@ -63,7 +86,7 @@ export const Chatbot = () => {
                         required: true,
                         validate: (data) => data.trim().length > 0,
                     })}
-                    className="w-full h-50 rounded-xl focus:outline-0 resize-none"
+                    className="w-full h-20 rounded-xl focus:outline-0 resize-none"
                     placeholder="Ask Anything"
                     maxLength={1000}
                 />
