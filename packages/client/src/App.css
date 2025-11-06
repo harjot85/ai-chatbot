@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 #root {
-    width: 98%;
     text-align: center;
+    height: 100%;
 }
 
 @theme inline {

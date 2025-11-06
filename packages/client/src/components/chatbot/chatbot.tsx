@@ -59,12 +59,20 @@ export const Chatbot = () => {
         }
     };
 
+    const onCopyHandler = (e: React.ClipboardEvent<HTMLParagraphElement>) => {
+        const selection = window.getSelection()?.toString().trim();
+        if (selection) {
+            e.preventDefault();
+            e.clipboardData.setData('text/plain', selection);
+        }
+    };
     return (
-        <div>
-            <div className="flex flex-col gap-4">
+        <div className="px-4 pb-4 flex flex-col flex-1 h-full ">
+            <div className="flex flex-col flex-1 gap-4 overflow-x-auto">
                 {messages?.map((message, index) => (
-                    <p
+                    <div
                         key={index}
+                        onCopy={onCopyHandler}
                         className={`rounded-2xl p-4  ${
                             message.role === 'bot'
                                 ? 'bg-gray-200 text-black text-left self-start'
@@ -72,7 +80,7 @@ export const Chatbot = () => {
                         }`}
                     >
                         <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </p>
+                    </div>
                 ))}
                 {isfetching && (
                     <div className="flex bg-gray-200 gap-1 self-start ml-2 px-6 py-4 rounded-2xl">
@@ -86,13 +94,14 @@ export const Chatbot = () => {
                 ref={formRef}
                 onKeyDown={handleKeyDown}
                 onSubmit={handleSubmit(onFormSubmit)}
-                className="flex flex-col gap-4 items-end m-4 w-full border-2 p-4 rounded-2xl"
+                className="flex flex-col gap-4 items-end mt-10 w-full border-2 p-4 rounded-2xl"
             >
                 <textarea
                     {...register('prompt', {
                         required: true,
                         validate: (data) => data.trim().length > 0,
                     })}
+                    autoFocus
                     className="w-full h-20 rounded-xl focus:outline-0 resize-none"
                     placeholder="Ask Anything"
                     maxLength={1000}
