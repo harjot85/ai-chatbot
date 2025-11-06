@@ -22,7 +22,7 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             onCopy={onCopyHandler}
             className={`rounded-2xl p-4  ${
                 message.role === 'bot'
-                    ? 'bg-gray-500 text-black text-left self-start'
+                    ? 'bg-gray-500 text-black text-left self-start max-w-xl'
                     : 'bg-green-700 text-white text-right self-end'
             }`}
         >

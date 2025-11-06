@@ -3,6 +3,14 @@ import { useEffect, useRef, useState } from 'react';
 import ChatInput, { type ChatFormData } from './ChatInput';
 import LoaderSymbol from './LoaderSymbol';
 import ChatMessage, { type Message } from './ChatMessage';
+import popSound from '@/assets/sounds/pop.mp3';
+import notificationSound from '@/assets/sounds/notification.mp3';
+
+const popAudio = new Audio(popSound);
+popAudio.volume = 0.2;
+
+const notificationAudio = new Audio(notificationSound);
+notificationAudio.volume = 0.2;
 
 type ChatResponse = {
     message: string;
@@ -33,6 +41,7 @@ export const Chatbot = () => {
                 { content: parsedData, role: 'user' },
             ]);
             setIsfetching(true);
+            popAudio.play();
 
             const prompt =
                 messages.length === 0 ? groundContext + parsedData : parsedData;
@@ -47,7 +56,7 @@ export const Chatbot = () => {
                 { content: data.message, role: 'bot' },
             ]);
             setIsfetching(false);
-            console.log(data);
+            notificationAudio.play();
         } catch (error) {
             console.error(error);
             setError('Something went wrong. Please try again.');
@@ -69,7 +78,7 @@ export const Chatbot = () => {
             </div>
             <div className="flex self-center border-b-2 border-green-900 mt-5 w-2xl" />
             <div className="flex self-center border-b-2 border-green-900 mt-1 mb-10 w-2xl" />
-            <div className="flex flex-col flex-1 gap-4 overflow-x-auto">
+            <div className="flex flex-col flex-1 gap-4 overflow-x-auto px-8">
                 {messages?.map((message, index) => (
                     <ChatMessage key={index} message={message} />
                 ))}
