@@ -22,8 +22,8 @@ const ChatMessage = ({ message }: ChatMessageProps) => {
             onCopy={onCopyHandler}
             className={`rounded-2xl p-4  ${
                 message.role === 'bot'
-                    ? 'bg-gray-200 text-black text-left self-start'
-                    : 'bg-blue-600 text-white text-right self-end'
+                    ? 'bg-gray-500 text-black text-left self-start'
+                    : 'bg-green-700 text-white text-right self-end'
             }`}
         >
             <ReactMarkdown>{message.content}</ReactMarkdown>

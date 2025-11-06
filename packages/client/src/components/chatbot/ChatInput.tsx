@@ -40,7 +40,7 @@ const ChatInput = ({ onFormSubmit, formRef }: Props) => {
                     validate: (data) => data.trim().length > 0,
                 })}
                 autoFocus
-                className="w-full h-20 rounded-xl focus:outline-0 resize-none"
+                className="w-full h-20 rounded-xl focus:outline-0 resize-none text-white"
                 placeholder="Ask Anything"
                 maxLength={1000}
             />

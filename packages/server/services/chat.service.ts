@@ -28,6 +28,9 @@ export const chatService = {
             id: response.id,
             message: response.output_text,
         };
+
+        // ToDo: Before returning the response, it should be validated and potentially sanitized.
+
         return serviceResponse;
     },
 };
