@@ -22,6 +22,7 @@ const rules = ' Keep the responses brief. ';
 
 export const Chatbot = () => {
     const conversationId = useRef(crypto.randomUUID());
+    const [error, setError] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
     const [isfetching, setIsfetching] = useState(false);
 
@@ -30,22 +31,33 @@ export const Chatbot = () => {
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
 
     const onFormSubmit = async (formData: FormData) => {
-        const parsedData = formData.prompt.trim();
-        setMessages((prev) => [...prev, { content: parsedData, role: 'user' }]);
-        setIsfetching(true);
-        reset();
+        try {
+            setError('');
+            const parsedData = formData.prompt.trim();
+            setMessages((prev) => [
+                ...prev,
+                { content: parsedData, role: 'user' },
+            ]);
+            setIsfetching(true);
+            reset();
 
-        const { data } = await axios.post<ChatResponse>('/api/chat', {
-            prompt: parsedData + rules,
-            conversationId: conversationId.current,
-        });
+            const { data } = await axios.post<ChatResponse>('/api/chat', {
+                prompt: parsedData + rules,
+                conversationId: conversationId.current,
+            });
 
-        setMessages((prev) => [
-            ...prev,
-            { content: data.message, role: 'bot' },
-        ]);
-        setIsfetching(false);
-        console.log(data);
+            setMessages((prev) => [
+                ...prev,
+                { content: data.message, role: 'bot' },
+            ]);
+            setIsfetching(false);
+            console.log(data);
+        } catch (error) {
+            console.error(error);
+            setError('Something went wrong. Please try again.');
+        } finally {
+            setIsfetching(false);
+        }
     };
 
     useEffect(() => {
@@ -89,6 +101,7 @@ export const Chatbot = () => {
                         <div className="h-3 w-3 rounded-full bg-gray-500 animate-bounce [animation-delay:0.2s]" />
                     </div>
                 )}
+                {error && <p className="text-red-500">{error}</p>}
             </div>
             <form
                 ref={formRef}
