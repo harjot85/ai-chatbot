@@ -35,7 +35,6 @@ export const Chatbot = () => {
             popAudio.play();
 
             const isFirstMessage = messages.length < 1;
-            console.log('isFirstMessage', isFirstMessage);
 
             const { data } = await axios.post<ChatResponse>('/api/chat', {
                 prompt: parsedData,

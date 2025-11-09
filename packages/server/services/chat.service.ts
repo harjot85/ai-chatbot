@@ -27,8 +27,6 @@ export const chatService = {
         conversationId: string,
         isFirstMessage: boolean
     ): Promise<ChatRespose> {
-        console.log('Is First Message (server)', isFirstMessage);
-
         const response = await client.responses.create({
             model: 'gpt-5-nano',
             input: isFirstMessage
