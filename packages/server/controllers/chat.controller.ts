@@ -22,10 +22,12 @@ export const chatController = {
         try {
             const prompt = req.body.prompt;
             const conversationId = req.body.conversationId;
+            const isFirstMessage = req.body.isFirstMessage;
 
             const response = await chatService.sendMessage(
                 prompt,
-                conversationId
+                conversationId,
+                isFirstMessage
             );
 
             res.json({ message: response.message });

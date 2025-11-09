@@ -16,15 +16,6 @@ type ChatResponse = {
     message: string;
 };
 
-// Keep in mind - Role, Context, Audience, Tone, Output format, Examples (well-formatted, clear, diverse)
-// If the Modal is unsure it can say sorry I don't know, do not guess or make up a response
-
-const groundContext = `You are an expert in travelling. Your role is assist the clients with best knowlegde in a friendly tone.  
-                Keep the reponses very short unless the clients specifically request for a desctiptive response. 
-                Use markdown wherever possible. Use bullet points, bolds and italics whereever possible. 
-                If the requst is too vague, ask 1 or 2 questions to clarify. Do not guess.
-                Here is their query: `;
-
 export const Chatbot = () => {
     const [error, setError] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
@@ -43,11 +34,12 @@ export const Chatbot = () => {
             setIsfetching(true);
             popAudio.play();
 
-            const prompt =
-                messages.length === 0 ? groundContext + parsedData : parsedData;
+            const isFirstMessage = messages.length < 1;
+            console.log('isFirstMessage', isFirstMessage);
 
             const { data } = await axios.post<ChatResponse>('/api/chat', {
-                prompt: prompt,
+                prompt: parsedData,
+                isFirstMessage: isFirstMessage,
                 conversationId: conversationId.current,
             });
 
